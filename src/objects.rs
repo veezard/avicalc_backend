@@ -29,6 +29,7 @@ impl State {
                 |var| match var {
                     Variable::Altimeter => 29.9212,
                     Variable::Temp => 15.,
+                    Variable::DewPoint => -65.,
                     Variable::WindDir => 0.,
                     Variable::WindSpeed => 0.,
                     Variable::Altitude => 0.,
@@ -223,6 +224,7 @@ pub enum Variable {
     CrossWind,
     DevAngl,
     GrdSpd,
+    DewPoint,
 }
 
 impl Show for Variable {
@@ -239,6 +241,7 @@ impl Show for Variable {
             Variable::Altitude => "alt".to_string(),
             Variable::Altimeter => "prst".to_string(),
             Variable::Temp => "tmp".to_string(),
+            Variable::DewPoint => "dpt".to_string(),
             Variable::DensAlt => "dal".to_string(),
             Variable::PressAlt => "pal".to_string(),
             Variable::WindDir => "wdr".to_string(),
@@ -489,6 +492,8 @@ fn test_conversion() {
     assert!(((15.0 as f64).convert(Unit::Foot, Unit::Mile) - 0.00284091).abs() < 0.0001);
     assert!(((15.0 as f64).convert(Unit::Foot, Unit::NauticalMile) - 0.00246868).abs() < 0.0001);
     assert!(((15.0 as f64).convert(Unit::Foot, Unit::Kilometer) - 0.004572).abs() < 0.0001);
+    assert!(((15.0 as f64).convert(Unit::Foot, Unit::Meter) - 4.572).abs() < 0.0001);
+    assert!(((15.0 as f64).convert(Unit::Meter, Unit::Foot) - 49.2126).abs() < 0.0001);
     assert!(((15.0 as f64).convert(Unit::Gallon, Unit::JetfuelPound) - 100.65).abs() < 0.0001);
     assert!(((15.0 as f64).convert(Unit::Gallon, Unit::AvigasPound) - 90.15).abs() < 0.0001);
     assert!(((15.0 as f64).convert(Unit::Knot, Unit::FeetPerMinute) - 1519.03).abs() < 0.01);

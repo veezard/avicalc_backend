@@ -124,6 +124,10 @@ fn main() {
                 Rc::new(RefCell::new(Box::new(|number: f64| {
                     print_number_at_location(number, "grsp=", 55, 5);
                 })))
+            } else if var == Variable::DewPoint {
+                Rc::new(RefCell::new(Box::new(|number: f64| {
+                    print_number_at_location(number, "dwpt=", 70, 5);
+                })))
             } else {
                 {
                     Rc::new(RefCell::new(Box::new(|_| {})))
@@ -248,7 +252,8 @@ fn main() {
                 Key::Char('S') => key_pressed_wrapper(A_ASSIGN_BUTTON),
                 Key::Char('D') => key_pressed_wrapper(B_ASSIGN_BUTTON),
                 Key::Char('F') => key_pressed_wrapper(C_ASSIGN_BUTTON),
-                Key::Char('G') => key_pressed_wrapper(D_ASSIGN_BUTTON),
+                //Key::Char('G') => key_pressed_wrapper(D_ASSIGN_BUTTON),
+                Key::Char('G') => key_pressed_wrapper(DEW_POINT_ASSIGN_BUTTON),
                 Key::Char('H') => key_pressed_wrapper(TEMP_ASSIGN_BUTTON),
                 Key::Char('J') => key_pressed_wrapper(ALTITUDE_ASSIGN_BUTTON),
                 Key::Char('K') => key_pressed_wrapper(ALTIMETER_ASSIGN_BUTTON),

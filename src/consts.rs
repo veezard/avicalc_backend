@@ -52,6 +52,7 @@ pub const WIND_SPEED_BUTTON: u16 = 54;
 pub const WIND_HEADING_BUTTON: u16 = 55;
 pub const HEADING_BUTTON: u16 = 56;
 pub const INDICATED_AIRSPEED_BUTTON: u16 = 57;
+pub const DEW_POINT_BUTTON: u16 = 58;
 
 // unassignable variables
 pub const PRESSURE_ALTITUDE_BUTTON: u16 = 61;
@@ -75,6 +76,7 @@ pub const WIND_SPEED_ASSIGN_BUTTON: u16 = 114;
 pub const WIND_HEADING_ASSIGN_BUTTON: u16 = 115;
 pub const HEADING_ASSIGN_BUTTON: u16 = 116;
 pub const INDICATED_AIRSPEED_ASSIGN_BUTTON: u16 = 117;
+pub const DEW_POINT_ASSIGN_BUTTON: u16 = 118;
 //Add buttons 200-299
 pub const A_ADD_BUTTON: u16 = 201;
 pub const B_ADD_BUTTON: u16 = 202;
@@ -88,6 +90,7 @@ pub const WIND_SPEED_ADD_BUTTON: u16 = 214;
 pub const WIND_HEADING_ADD_BUTTON: u16 = 215;
 pub const HEADING_ADD_BUTTON: u16 = 216;
 pub const INDICATED_AIRSPEED_ADD_BUTTON: u16 = 217;
+pub const DEW_POINT_ADD_BUTTON: u16 = 218;
 
 // conversion buttons 300-399
 pub const NM_TO_FEET_BUTTON: u16 = 301;
@@ -147,6 +150,7 @@ pub fn button_number_to_token(button: u16) -> Token {
         C_BUTTON => Token::Variable(Variable::C),
         D_BUTTON => Token::Variable(Variable::D),
         TEMP_BUTTON => Token::Variable(Variable::Temp),
+        DEW_POINT_BUTTON => Token::Variable(Variable::DewPoint),
         ALTITUDE_BUTTON => Token::Variable(Variable::Altitude),
         ALTIMETER_BUTTON => Token::Variable(Variable::Altimeter),
         WIND_SPEED_BUTTON => Token::Variable(Variable::WindSpeed),
@@ -165,6 +169,7 @@ pub fn button_number_to_token(button: u16) -> Token {
         C_ASSIGN_BUTTON => Token::Variable(Variable::C),
         D_ASSIGN_BUTTON => Token::Variable(Variable::D),
         TEMP_ASSIGN_BUTTON => Token::Variable(Variable::Temp),
+        DEW_POINT_ASSIGN_BUTTON => Token::Variable(Variable::DewPoint),
         ALTITUDE_ASSIGN_BUTTON => Token::Variable(Variable::Altitude),
         ALTIMETER_ASSIGN_BUTTON => Token::Variable(Variable::Altimeter),
         WIND_SPEED_ASSIGN_BUTTON => Token::Variable(Variable::WindSpeed),
@@ -176,6 +181,7 @@ pub fn button_number_to_token(button: u16) -> Token {
         C_ADD_BUTTON => Token::Variable(Variable::C),
         D_ADD_BUTTON => Token::Variable(Variable::D),
         TEMP_ADD_BUTTON => Token::Variable(Variable::Temp),
+        DEW_POINT_ADD_BUTTON => Token::Variable(Variable::DewPoint),
         ALTITUDE_ADD_BUTTON => Token::Variable(Variable::Altitude),
         ALTIMETER_ADD_BUTTON => Token::Variable(Variable::Altimeter),
         WIND_SPEED_ADD_BUTTON => Token::Variable(Variable::WindSpeed),

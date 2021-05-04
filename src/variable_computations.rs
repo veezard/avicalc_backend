@@ -2,7 +2,7 @@ use crate::objects::*;
 use std::f64::consts::PI;
 
 pub fn update_unassignable_quantities(state: &mut Box<State>) {
-    let p_0 = state
+    let altimeter = state
         .variable_values
         .get(Variable::Altimeter)
         .convert(Unit::InHg, Unit::Pascal);
@@ -10,16 +10,26 @@ pub fn update_unassignable_quantities(state: &mut Box<State>) {
         .variable_values
         .get(Variable::Altitude)
         .convert(Unit::Foot, Unit::Meter);
-    let temp = state
+    let temperature = state
         .variable_values
         .get(Variable::Temp)
         .convert(Unit::Celcius, Unit::Kelvin);
-    let t_0 = temp + altitude * L_TEMPERATURE_LAPSE;
-    let pressure_assuming_std_temp = pressure_function(p_0, STD_T_0, altitude);
-    let pressure_altitude = std_pressure_to_altitude(pressure_assuming_std_temp);
+    let dew_point = state.variable_values.get(Variable::DewPoint); // The dew point is in Celcius
 
-    let density = density_function(p_0, t_0, altitude);
-    let density_altitude = std_density_to_altitude(density);
+    let pressure = pressure_from_altimeter_and_altitude(altimeter, altitude);
+    let pressure_altitude = altitude_from_std_pressure(pressure);
+
+    let water_vapor_pressure = water_vapor_pressure_from_dew_point(dew_point);
+    let dry_air_pressure = pressure - water_vapor_pressure;
+
+    let density =
+        density_from_pressure_and_temperature(dry_air_pressure, temperature, M_MOLAR_MASS_DRY_AIR)
+            + density_from_pressure_and_temperature(
+                water_vapor_pressure,
+                temperature,
+                M_MOLAR_MASS_WATER_VAPOR,
+            );
+    let density_altitude = altitude_from_std_density(density);
 
     let ias = state.variable_values.get(Variable::Ias);
     let tas = from_density_and_ias_to_tas(density, ias);
@@ -51,43 +61,60 @@ pub fn update_unassignable_quantities(state: &mut Box<State>) {
     state.variable_values.set(Variable::GrdSpd, ground_speed);
 }
 
-// Let P_0,T_0 be the pressure and temperature at sea level (in pascals and kelvin). Then
+// Let P_0,T_0, r_0 be the pressure, temperature, and dry air density at sea level (in pascals and kelvin). Then
 // T(h) = T_0 - h L
 // P(h) = P_0 (1-Lh/T_0)^(gM/RL)
 // r(h) = (P_0/T_0)(M/R) (1-Lh/T_0)^(gM/RL -1)
-// r(h) = R_0 (1-Lh/T_0)^(gM/RL -1)
+// r(h) = r_0 (1-Lh/T_0)^(gM/RL -1)
+// P= r T (R/M)
 
-fn pressure_function(p_0: f64, t_0: f64, h: f64) -> f64 {
-    p_0 * (1. - (L_TEMPERATURE_LAPSE * h) / t_0).powf(GM_BY_RL)
-}
-fn density_function(p_0: f64, t_0: f64, h: f64) -> f64 {
-    (p_0 / t_0) * M_BY_R * (1. - (L_TEMPERATURE_LAPSE * h) / t_0).powf(GM_BY_RL - 1.)
-}
-
-fn std_pressure_to_altitude(pressure: f64) -> f64 {
+fn altitude_from_std_pressure(pressure: f64) -> f64 {
     (1. - (pressure / STD_P_0).powf(1. / GM_BY_RL)) * STD_T_0 / L_TEMPERATURE_LAPSE
 }
 
-fn std_density_to_altitude(density: f64) -> f64 {
+fn altitude_from_std_density(density: f64) -> f64 {
     (1. - (density / STD_R_0).powf(1. / (GM_BY_RL - 1.))) * STD_T_0 / L_TEMPERATURE_LAPSE
+}
+// The altimeter setting takes into account the error of altimeter indication. The altimeter shifts
+// the indicated altitude by the would be pressure altitude at height 0
+// h =~ ((AS/P_0)^{RL/gM} - (P/P_0)^{RL/gM}) (T_0/L) // AS is the altimeter setting
+// The altimeter setting is such that the indicated altitude is correct at the airfield altitude.
+// P = P_0 (  (AS/P_0)^{RL/gM)- h (L/T_0))^{gM/RL}
+
+fn pressure_from_altimeter_and_altitude(altimeter: f64, altitude: f64) -> f64 {
+    STD_P_0
+        * ((altimeter / STD_P_0).powf(RL_BY_GM) - altitude * L_TEMPERATURE_LAPSE / STD_T_0)
+            .powf(GM_BY_RL)
+}
+
+fn density_from_pressure_and_temperature(pressure: f64, temperature: f64, molar_mass: f64) -> f64 {
+    pressure * molar_mass / (temperature * R_IDEAL_GAS_CONSTANT)
+}
+
+fn water_vapor_pressure_from_dew_point(dew_point: f64) -> f64 {
+    //Arden Buck equation
+    //dew_point should be in celcius
+
+    (0.61121 * ((18.678 - dew_point / 234.5) * (dew_point / (257.14 + dew_point))).exp())
+        .convert(Unit::Kilopascal, Unit::Pascal)
 }
 
 fn from_density_and_ias_to_tas(density: f64, ias: f64) -> f64 {
     ias * (STD_R_0 / density).sqrt()
 }
 
-const STD_P_0_IN_INHG: f64 = 29.9212; //inHg
 const STD_P_0: f64 = 101324.8126; //kg / m s^2 = pascals
 const STD_T_0: f64 = 288.15; //K
 const STD_R_0: f64 = 1.225; // kg/ m^3
 
 const L_TEMPERATURE_LAPSE: f64 = 0.0065; // K/m
-const M_MOLAR_MASS: f64 = 0.0289652; //kg/mol
+const M_MOLAR_MASS_DRY_AIR: f64 = 0.0289652; //kg/mol
+const M_MOLAR_MASS_WATER_VAPOR: f64 = 0.01801528; //kg/mol
 const G_ACCELERATION_GRAVITY: f64 = 9.80665; // m/s^2
 const R_IDEAL_GAS_CONSTANT: f64 = 8.31446; // kg m^2 / s^2 mol K
 const GM_BY_RL: f64 =
-    G_ACCELERATION_GRAVITY * M_MOLAR_MASS / (R_IDEAL_GAS_CONSTANT * L_TEMPERATURE_LAPSE);
-const M_BY_R: f64 = M_MOLAR_MASS / R_IDEAL_GAS_CONSTANT; // s^2 K / m^2
+    G_ACCELERATION_GRAVITY * M_MOLAR_MASS_DRY_AIR / (R_IDEAL_GAS_CONSTANT * L_TEMPERATURE_LAPSE);
+const RL_BY_GM: f64 = 1. / GM_BY_RL;
 
 #[cfg(test)]
 mod test_var_computations {
@@ -96,6 +123,9 @@ mod test_var_computations {
     use crate::*;
     use std::rc::Rc;
 
+    fn compare(a: f64, b: f64, preccision: f64) -> bool {
+        (a - b).abs() < preccision
+    }
     unsafe fn initiate_state() {
         fn gui_update_functions(_: Variable) -> Rc<RefCell<Box<dyn FnMut(f64) -> ()>>> {
             Rc::new(RefCell::new(Box::new(|_: f64| {})))
@@ -116,10 +146,14 @@ mod test_var_computations {
         unsafe {
             initiate_state();
             let mut state = &mut STATE.as_ref().unwrap().borrow_mut();
-            state.variable_values.set(Variable::Altimeter, 31.);
-            state.variable_values.set(Variable::Altitude, 15000.);
+            state.variable_values.set(Variable::Altimeter, 29.);
+            state.variable_values.set(Variable::Altitude, 8000.);
             update_unassignable_quantities(&mut state);
-            assert!(state.variable_values.get(Variable::PressAlt) - 14017. < 200.);
+            assert!(compare(
+                state.variable_values.get(Variable::PressAlt),
+                8862.,
+                10.
+            ));
         }
     }
     #[test]
@@ -127,11 +161,16 @@ mod test_var_computations {
         unsafe {
             initiate_state();
             let mut state = &mut STATE.as_ref().unwrap().borrow_mut();
-            state.variable_values.set(Variable::Altimeter, 31.);
+            state.variable_values.set(Variable::Altimeter, 28.);
             state.variable_values.set(Variable::Altitude, 15000.);
             state.variable_values.set(Variable::Temp, 5.);
+            state.variable_values.set(Variable::DewPoint, 25.);
             update_unassignable_quantities(&mut state);
-            assert!(state.variable_values.get(Variable::DensAlt) - 16038. < 500.);
+            assert!(compare(
+                state.variable_values.get(Variable::DensAlt),
+                20125.,
+                10.
+            ));
         }
     }
     #[test]
@@ -139,8 +178,12 @@ mod test_var_computations {
         unsafe {
             initiate_state();
             let mut state = &mut STATE.as_ref().unwrap().borrow_mut();
+            state.variable_values.set(Variable::Altimeter, 28.5);
+            state.variable_values.set(Variable::Altitude, 11000.);
+            state.variable_values.set(Variable::Temp, 0.);
+            state.variable_values.set(Variable::Ias, 65.);
             update_unassignable_quantities(&mut state);
-            //assert!(state.variable_values.get(Variable::Tas) - 0. < 0.001);
+            assert!(compare(state.variable_values.get(Variable::Tas), 80., 1.));
         }
     }
     #[test]
@@ -149,7 +192,15 @@ mod test_var_computations {
             initiate_state();
             let mut state = &mut STATE.as_ref().unwrap().borrow_mut();
             update_unassignable_quantities(&mut state);
-            //assert!(state.variable_values.get(Variable::CrossWind) - 0. < 0.001);
+            state.variable_values.set(Variable::WindDir, 100.);
+            state.variable_values.set(Variable::WindSpeed, 24.);
+            state.variable_values.set(Variable::Heading, 210.);
+            update_unassignable_quantities(&mut state);
+            assert!(compare(
+                state.variable_values.get(Variable::CrossWind),
+                -22.6,
+                0.1
+            ));
         }
     }
     #[test]
@@ -157,8 +208,15 @@ mod test_var_computations {
         unsafe {
             initiate_state();
             let mut state = &mut STATE.as_ref().unwrap().borrow_mut();
+            state.variable_values.set(Variable::WindDir, 100.);
+            state.variable_values.set(Variable::WindSpeed, 24.);
+            state.variable_values.set(Variable::Heading, 210.);
             update_unassignable_quantities(&mut state);
-            //assert!(state.variable_values.get(Variable::HeadWind) - 0. < 0.001);
+            assert!(compare(
+                state.variable_values.get(Variable::HeadWind),
+                -8.2,
+                0.1
+            ));
         }
     }
     #[test]
@@ -167,7 +225,7 @@ mod test_var_computations {
             initiate_state();
             let mut state = &mut STATE.as_ref().unwrap().borrow_mut();
             update_unassignable_quantities(&mut state);
-            //assert!(state.variable_values.get(Variable::GrdSpd) - 0. < 0.001);
+            //assert!(compare(state.variable_values.get(Variable::GrdSpd) , 0. , 0.001));
         }
     }
     #[test]
@@ -175,8 +233,19 @@ mod test_var_computations {
         unsafe {
             initiate_state();
             let mut state = &mut STATE.as_ref().unwrap().borrow_mut();
+            state.variable_values.set(Variable::WindDir, 100.);
+            state.variable_values.set(Variable::WindSpeed, 24.);
+            state.variable_values.set(Variable::Heading, 210.);
+            state.variable_values.set(Variable::Altimeter, 28.5);
+            state.variable_values.set(Variable::Altitude, 11000.);
+            state.variable_values.set(Variable::Temp, 0.);
+            state.variable_values.set(Variable::Ias, 65.);
             update_unassignable_quantities(&mut state);
-            //assert!(state.variable_values.get(Variable::DevAngl) - 0. < 0.001);
+            assert!(compare(
+                state.variable_values.get(Variable::DevAngl),
+                -16.40,
+                0.1
+            ));
         }
     }
 }
