@@ -219,6 +219,8 @@ pub fn button_number_to_pair_of_units(button: u16) -> (Unit, Unit) {
         GALLONS_TO_JET_FUEL_LBS_BUTTON => (Unit::Gallon, Unit::JetfuelPound),
         INHG_TO_HECTOPASCALS_BUTTON => (Unit::InHg, Unit::Hectopascal),
         HECTOPASCALS_TO_INHG_BUTTON => (Unit::Hectopascal, Unit::InHg),
+        FEET_TO_METERS => (Unit::Foot, Unit::Meter),
+        METERS_TO_FEET => (Unit::Meter, Unit::Foot),
         _ => {
             panic!("This match should be exhaustive");
             (Unit::Celcius, Unit::Celcius) //To please the almighty compiler
