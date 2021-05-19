@@ -31,16 +31,17 @@ pub fn update_unassignable_quantities(state: &mut Box<State>) {
             );
     let density_altitude = altitude_from_std_density(density);
 
-    let ias = state.variable_values.get(Variable::Ias);
-    let tas = from_density_and_ias_to_tas(density, ias);
+    let cas = state.variable_values.get(Variable::Cas);
+    let tas = from_density_and_cas_to_tas(density, cas);
 
     let wind_direction = state.variable_values.get(Variable::WindDir);
     let wind_speed = state.variable_values.get(Variable::WindSpeed);
-    let heading = state.variable_values.get(Variable::Heading);
-    let head_wind = (PI * (heading - wind_direction) / 180.).cos() * wind_speed;
-    let cross_wind = (PI * (wind_direction - heading) / 180.).sin() * wind_speed;
+    let course = state.variable_values.get(Variable::Course);
+    let head_wind = (PI * (course - wind_direction) / 180.).cos() * wind_speed;
+    let cross_wind = (PI * (wind_direction - course) / 180.).sin() * wind_speed;
 
     let deviation_angle = 180. * (cross_wind / tas).asin() / PI;
+    let heading = (course + deviation_angle + 360.) % 360.;
 
     let ground_speed = tas * (PI * deviation_angle / 180.).cos() - head_wind;
 
@@ -55,9 +56,7 @@ pub fn update_unassignable_quantities(state: &mut Box<State>) {
     state.variable_values.set(Variable::Tas, tas);
     state.variable_values.set(Variable::CrossWind, cross_wind);
     state.variable_values.set(Variable::HeadWind, head_wind);
-    state
-        .variable_values
-        .set(Variable::DevAngl, deviation_angle);
+    state.variable_values.set(Variable::Heading, heading);
     state.variable_values.set(Variable::GrdSpd, ground_speed);
 }
 
@@ -99,8 +98,8 @@ fn water_vapor_pressure_from_dew_point(dew_point: f64) -> f64 {
         .convert(Unit::Kilopascal, Unit::Pascal)
 }
 
-fn from_density_and_ias_to_tas(density: f64, ias: f64) -> f64 {
-    ias * (STD_R_0 / density).sqrt()
+fn from_density_and_cas_to_tas(density: f64, cas: f64) -> f64 {
+    cas * (STD_R_0 / density).sqrt()
 }
 
 const STD_P_0: f64 = 101324.8126; //kg / m s^2 = pascals
@@ -181,7 +180,7 @@ mod test_var_computations {
             state.variable_values.set(Variable::Altimeter, 28.5);
             state.variable_values.set(Variable::Altitude, 11000.);
             state.variable_values.set(Variable::Temp, 0.);
-            state.variable_values.set(Variable::Ias, 65.);
+            state.variable_values.set(Variable::Cas, 65.);
             update_unassignable_quantities(&mut state);
             assert!(compare(state.variable_values.get(Variable::Tas), 80., 1.));
         }
@@ -194,7 +193,7 @@ mod test_var_computations {
             update_unassignable_quantities(&mut state);
             state.variable_values.set(Variable::WindDir, 100.);
             state.variable_values.set(Variable::WindSpeed, 24.);
-            state.variable_values.set(Variable::Heading, 210.);
+            state.variable_values.set(Variable::Course, 210.);
             update_unassignable_quantities(&mut state);
             assert!(compare(
                 state.variable_values.get(Variable::CrossWind),
@@ -210,7 +209,7 @@ mod test_var_computations {
             let mut state = &mut STATE.as_ref().unwrap().borrow_mut();
             state.variable_values.set(Variable::WindDir, 100.);
             state.variable_values.set(Variable::WindSpeed, 24.);
-            state.variable_values.set(Variable::Heading, 210.);
+            state.variable_values.set(Variable::Course, 210.);
             update_unassignable_quantities(&mut state);
             assert!(compare(
                 state.variable_values.get(Variable::HeadWind),
@@ -229,21 +228,21 @@ mod test_var_computations {
         }
     }
     #[test]
-    fn test_deviation_angle() {
+    fn test_heading() {
         unsafe {
             initiate_state();
             let mut state = &mut STATE.as_ref().unwrap().borrow_mut();
             state.variable_values.set(Variable::WindDir, 100.);
             state.variable_values.set(Variable::WindSpeed, 24.);
-            state.variable_values.set(Variable::Heading, 210.);
+            state.variable_values.set(Variable::Course, 210.);
             state.variable_values.set(Variable::Altimeter, 28.5);
             state.variable_values.set(Variable::Altitude, 11000.);
             state.variable_values.set(Variable::Temp, 0.);
-            state.variable_values.set(Variable::Ias, 65.);
+            state.variable_values.set(Variable::Cas, 65.);
             update_unassignable_quantities(&mut state);
             assert!(compare(
-                state.variable_values.get(Variable::DevAngl),
-                -16.40,
+                state.variable_values.get(Variable::Heading),
+                210. - 16.40,
                 0.1
             ));
         }

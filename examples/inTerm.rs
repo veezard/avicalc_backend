@@ -68,9 +68,9 @@ fn main() {
                 Rc::new(RefCell::new(Box::new(|number: f64| {
                     print_number_at_location(number, "d=", 85, 1);
                 })))
-            } else if var == Variable::Ias {
+            } else if var == Variable::Cas {
                 Rc::new(RefCell::new(Box::new(|number: f64| {
-                    print_number_at_location(number, "ias=", 40, 2);
+                    print_number_at_location(number, "cas=", 40, 2);
                 })))
             } else if var == Variable::Tas {
                 Rc::new(RefCell::new(Box::new(|number: f64| {
@@ -104,9 +104,9 @@ fn main() {
                 Rc::new(RefCell::new(Box::new(|number: f64| {
                     print_number_at_location(number, "wsp=", 40, 4);
                 })))
-            } else if var == Variable::Heading {
+            } else if var == Variable::Course {
                 Rc::new(RefCell::new(Box::new(|number: f64| {
-                    print_number_at_location(number, "hdg=", 55, 4);
+                    print_number_at_location(number, "crs=", 55, 4);
                 })))
             } else if var == Variable::HeadWind {
                 Rc::new(RefCell::new(Box::new(|number: f64| {
@@ -116,9 +116,9 @@ fn main() {
                 Rc::new(RefCell::new(Box::new(|number: f64| {
                     print_number_at_location(number, "crwd=", 85, 4);
                 })))
-            } else if var == Variable::DevAngl {
+            } else if var == Variable::Heading {
                 Rc::new(RefCell::new(Box::new(|number: f64| {
-                    print_number_at_location(number, "dang=", 40, 5);
+                    print_number_at_location(number, "hdg=", 40, 5);
                 })))
             } else if var == Variable::GrdSpd {
                 Rc::new(RefCell::new(Box::new(|number: f64| {
@@ -240,8 +240,8 @@ fn main() {
                 Key::Char('k') => key_pressed_wrapper(ALTIMETER_BUTTON),
                 Key::Char('l') => key_pressed_wrapper(WIND_SPEED_BUTTON),
                 Key::Char(';') => key_pressed_wrapper(WIND_HEADING_BUTTON),
-                Key::Char(']') => key_pressed_wrapper(HEADING_BUTTON),
-                Key::Char('[') => key_pressed_wrapper(INDICATED_AIRSPEED_BUTTON),
+                Key::Char(']') => key_pressed_wrapper(COURSE_BUTTON),
+                Key::Char('[') => key_pressed_wrapper(CALIBRATED_AIRSPEED_BUTTON),
                 Key::Char('p') => key_pressed_wrapper(PRESSURE_ALTITUDE_BUTTON),
                 Key::Char('o') => key_pressed_wrapper(DENSITY_ALTITUDE_BUTTON),
                 Key::Char('i') => key_pressed_wrapper(HEAD_WIND_BUTTON),
@@ -259,8 +259,8 @@ fn main() {
                 Key::Char('K') => key_pressed_wrapper(ALTIMETER_ASSIGN_BUTTON),
                 Key::Char('L') => key_pressed_wrapper(WIND_SPEED_ASSIGN_BUTTON),
                 Key::Char(':') => key_pressed_wrapper(WIND_HEADING_ASSIGN_BUTTON),
-                Key::Char('}') => key_pressed_wrapper(HEADING_ASSIGN_BUTTON),
-                Key::Char('{') => key_pressed_wrapper(INDICATED_AIRSPEED_ASSIGN_BUTTON),
+                Key::Char('}') => key_pressed_wrapper(COURSE_ASSIGN_BUTTON),
+                Key::Char('{') => key_pressed_wrapper(CALIBRATED_AIRSPEED_ASSIGN_BUTTON),
 
                 //Key::Ctrl('s') => key_pressed_wrapper(A_ADD_BUTTON),
                 //Key::Ctrl('d') => key_pressed_wrapper(B_ADD_BUTTON),
@@ -271,8 +271,8 @@ fn main() {
                 //Key::Ctrl('k') => key_pressed_wrapper(ALTIMETER_ADD_BUTTON),
                 //Key::Ctrl('l') => key_pressed_wrapper(WIND_SPEED_ADD_BUTTON),
                 //Key::Ctrl(';') => key_pressed_wrapper(WIND_HEADING_ADD_BUTTON),
-                //Key::Ctrl(']') => key_pressed_wrapper(HEADING_ADD_BUTTON),
-                //Key::Ctrl('[') => key_pressed_wrapper(INDICATED_AIRSPEED_ADD_BUTTON),
+                //Key::Ctrl(']') => key_pressed_wrapper(COURSE_ADD_BUTTON),
+                //Key::Ctrl('[') => key_pressed_wrapper(CALIBRATED_AIRSPEED_ADD_BUTTON),
 
                 //Key::Char('A') => key_pressed_wrapper(NM_TO_FEET_BUTTON),
                 //Key::Char('S') => key_pressed_wrapper(FEET_TO_NM_BUTTON),

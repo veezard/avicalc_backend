@@ -6,24 +6,28 @@ use std::cell::RefCell;
 use std::collections::VecDeque;
 use std::result::Result;
 
-pub fn equals_pressed(
-    state: &mut Box<State>,
-    string_writers: &mut Vec<RefCell<Box<dyn FnMut(String) -> ()>>>,
-) {
+pub fn compute_entry_field(state: &mut Box<State>) -> Result<f64, String> {
     /*Implements shunting yard algorithm */
-
     let rpn_notation_maybe: Result<VecDeque<Token>, String> = entry_field_to_rpn(state);
     if let Err(err) = rpn_notation_maybe {
-        string_writers[ENTRY_FIELD_WRITER].borrow_mut()(err);
-        return ();
+        return Err(err);
     }
     let mut rpn_notation = rpn_notation_maybe.unwrap();
 
     match evaluate_rpn(&mut rpn_notation) {
         Err(err) => {
-            string_writers[ENTRY_FIELD_WRITER].borrow_mut()(err);
-            return ();
+            return Err(err);
         }
+        Ok(answer) => Ok(answer),
+    }
+}
+pub fn equals_pressed(
+    state: &mut Box<State>,
+    string_writers: &mut Vec<RefCell<Box<dyn FnMut(String) -> ()>>>,
+) {
+    let result = compute_entry_field(state);
+    match result {
+        Err(err) => string_writers[ENTRY_FIELD_WRITER].borrow_mut()(err),
         Ok(answer) => {
             state
                 .variable_values
@@ -33,7 +37,6 @@ pub fn equals_pressed(
             state.entry_field.clear();
             update_string_field(state, string_writers, ENTRY_FIELD_WRITER);
             update_string_field(state, string_writers, PREVIOUS_ENTRY_FIELD_WRITER);
-            return ();
         }
     }
 }

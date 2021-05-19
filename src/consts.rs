@@ -50,8 +50,8 @@ pub const ALTITUDE_BUTTON: u16 = 52;
 pub const ALTIMETER_BUTTON: u16 = 53;
 pub const WIND_SPEED_BUTTON: u16 = 54;
 pub const WIND_HEADING_BUTTON: u16 = 55;
-pub const HEADING_BUTTON: u16 = 56;
-pub const INDICATED_AIRSPEED_BUTTON: u16 = 57;
+pub const COURSE_BUTTON: u16 = 56;
+pub const CALIBRATED_AIRSPEED_BUTTON: u16 = 57;
 pub const DEW_POINT_BUTTON: u16 = 58;
 
 // unassignable variables
@@ -74,8 +74,8 @@ pub const ALTITUDE_ASSIGN_BUTTON: u16 = 112;
 pub const ALTIMETER_ASSIGN_BUTTON: u16 = 113;
 pub const WIND_SPEED_ASSIGN_BUTTON: u16 = 114;
 pub const WIND_HEADING_ASSIGN_BUTTON: u16 = 115;
-pub const HEADING_ASSIGN_BUTTON: u16 = 116;
-pub const INDICATED_AIRSPEED_ASSIGN_BUTTON: u16 = 117;
+pub const COURSE_ASSIGN_BUTTON: u16 = 116;
+pub const CALIBRATED_AIRSPEED_ASSIGN_BUTTON: u16 = 117;
 pub const DEW_POINT_ASSIGN_BUTTON: u16 = 118;
 //Add buttons 200-299
 pub const A_ADD_BUTTON: u16 = 201;
@@ -88,8 +88,8 @@ pub const ALTITUDE_ADD_BUTTON: u16 = 212;
 pub const ALTIMETER_ADD_BUTTON: u16 = 213;
 pub const WIND_SPEED_ADD_BUTTON: u16 = 214;
 pub const WIND_HEADING_ADD_BUTTON: u16 = 215;
-pub const HEADING_ADD_BUTTON: u16 = 216;
-pub const INDICATED_AIRSPEED_ADD_BUTTON: u16 = 217;
+pub const COURSE_ADD_BUTTON: u16 = 216;
+pub const CALIBRATED_AIRSPEED_ADD_BUTTON: u16 = 217;
 pub const DEW_POINT_ADD_BUTTON: u16 = 218;
 
 // conversion buttons 300-399
@@ -155,13 +155,13 @@ pub fn button_number_to_token(button: u16) -> Token {
         ALTIMETER_BUTTON => Token::Variable(Variable::Altimeter),
         WIND_SPEED_BUTTON => Token::Variable(Variable::WindSpeed),
         WIND_HEADING_BUTTON => Token::Variable(Variable::WindDir),
-        HEADING_BUTTON => Token::Variable(Variable::Heading),
-        INDICATED_AIRSPEED_BUTTON => Token::Variable(Variable::Ias),
+        COURSE_BUTTON => Token::Variable(Variable::Course),
+        CALIBRATED_AIRSPEED_BUTTON => Token::Variable(Variable::Cas),
         PRESSURE_ALTITUDE_BUTTON => Token::Variable(Variable::PressAlt),
         DENSITY_ALTITUDE_BUTTON => Token::Variable(Variable::DensAlt),
         HEAD_WIND_BUTTON => Token::Variable(Variable::HeadWind),
         CROSS_WIND_BUTTON => Token::Variable(Variable::CrossWind),
-        DEVIATION_ANGLE_BUTTON => Token::Variable(Variable::DevAngl),
+        DEVIATION_ANGLE_BUTTON => Token::Variable(Variable::Heading),
         TRUE_AIRSPEED_BUTTON => Token::Variable(Variable::Tas),
         GROUND_SPEED_BUTTON => Token::Variable(Variable::GrdSpd),
         A_ASSIGN_BUTTON => Token::Variable(Variable::A),
@@ -174,8 +174,8 @@ pub fn button_number_to_token(button: u16) -> Token {
         ALTIMETER_ASSIGN_BUTTON => Token::Variable(Variable::Altimeter),
         WIND_SPEED_ASSIGN_BUTTON => Token::Variable(Variable::WindSpeed),
         WIND_HEADING_ASSIGN_BUTTON => Token::Variable(Variable::WindDir),
-        HEADING_ASSIGN_BUTTON => Token::Variable(Variable::Heading),
-        INDICATED_AIRSPEED_ASSIGN_BUTTON => Token::Variable(Variable::Ias),
+        COURSE_ASSIGN_BUTTON => Token::Variable(Variable::Course),
+        CALIBRATED_AIRSPEED_ASSIGN_BUTTON => Token::Variable(Variable::Cas),
         A_ADD_BUTTON => Token::Variable(Variable::A),
         B_ADD_BUTTON => Token::Variable(Variable::B),
         C_ADD_BUTTON => Token::Variable(Variable::C),
@@ -186,8 +186,8 @@ pub fn button_number_to_token(button: u16) -> Token {
         ALTIMETER_ADD_BUTTON => Token::Variable(Variable::Altimeter),
         WIND_SPEED_ADD_BUTTON => Token::Variable(Variable::WindSpeed),
         WIND_HEADING_ADD_BUTTON => Token::Variable(Variable::WindDir),
-        HEADING_ADD_BUTTON => Token::Variable(Variable::Heading),
-        INDICATED_AIRSPEED_ADD_BUTTON => Token::Variable(Variable::Ias),
+        COURSE_ADD_BUTTON => Token::Variable(Variable::Course),
+        CALIBRATED_AIRSPEED_ADD_BUTTON => Token::Variable(Variable::Cas),
 
         _ => {
             panic!("This match should be exhaustive.")
