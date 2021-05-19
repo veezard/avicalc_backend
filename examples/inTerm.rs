@@ -246,7 +246,7 @@ fn main() {
                 Key::Char('o') => key_pressed_wrapper(DENSITY_ALTITUDE_BUTTON),
                 Key::Char('i') => key_pressed_wrapper(HEAD_WIND_BUTTON),
                 Key::Char('u') => key_pressed_wrapper(CROSS_WIND_BUTTON),
-                Key::Char('y') => key_pressed_wrapper(DEVIATION_ANGLE_BUTTON),
+                Key::Char('y') => key_pressed_wrapper(HEADING_BUTTON),
                 Key::Char('t') => key_pressed_wrapper(TRUE_AIRSPEED_BUTTON),
                 Key::Char('r') => key_pressed_wrapper(GROUND_SPEED_BUTTON),
                 Key::Char('S') => key_pressed_wrapper(A_ASSIGN_BUTTON),

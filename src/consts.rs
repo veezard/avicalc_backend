@@ -59,7 +59,7 @@ pub const PRESSURE_ALTITUDE_BUTTON: u16 = 61;
 pub const DENSITY_ALTITUDE_BUTTON: u16 = 62;
 pub const HEAD_WIND_BUTTON: u16 = 63;
 pub const CROSS_WIND_BUTTON: u16 = 64;
-pub const DEVIATION_ANGLE_BUTTON: u16 = 65;
+pub const HEADING_BUTTON: u16 = 65;
 pub const TRUE_AIRSPEED_BUTTON: u16 = 66;
 pub const GROUND_SPEED_BUTTON: u16 = 67;
 
@@ -161,7 +161,7 @@ pub fn button_number_to_token(button: u16) -> Token {
         DENSITY_ALTITUDE_BUTTON => Token::Variable(Variable::DensAlt),
         HEAD_WIND_BUTTON => Token::Variable(Variable::HeadWind),
         CROSS_WIND_BUTTON => Token::Variable(Variable::CrossWind),
-        DEVIATION_ANGLE_BUTTON => Token::Variable(Variable::Heading),
+        HEADING_BUTTON => Token::Variable(Variable::Heading),
         TRUE_AIRSPEED_BUTTON => Token::Variable(Variable::Tas),
         GROUND_SPEED_BUTTON => Token::Variable(Variable::GrdSpd),
         A_ASSIGN_BUTTON => Token::Variable(Variable::A),
