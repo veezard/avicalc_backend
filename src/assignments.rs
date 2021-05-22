@@ -20,6 +20,10 @@ pub fn assign_pressed(
             }
             Ok(answer) => {
                 state.entry_field.clear();
+                state
+                    .variable_values
+                    .set(Variable::PrevAns, state.variable_values.get(Variable::Ans));
+                state.variable_values.set(Variable::Ans, answer);
                 update_string_field(state, string_writers, ENTRY_FIELD_WRITER);
                 value_to_assign = answer;
             }
@@ -51,6 +55,10 @@ pub fn add_to_var_pressed(
             }
             Ok(answer) => {
                 state.entry_field.clear();
+                state
+                    .variable_values
+                    .set(Variable::PrevAns, state.variable_values.get(Variable::Ans));
+                state.variable_values.set(Variable::Ans, answer);
                 update_string_field(state, string_writers, ENTRY_FIELD_WRITER);
                 value_to_add = answer;
             }
